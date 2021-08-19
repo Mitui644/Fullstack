@@ -16,11 +16,20 @@ const Country = ({name, capital, population, languages, flag}) => {
   )
 }
 
-const QueryResult = ({countries}) => {
+const QueryResult = ({countries, viewCountryCallback}) => {
   if(countries.length > 10) {
     return (<p>Too many matches, specify another filter</p>)
   } else if(countries.length > 1) {
-    return (countries.map(country => <p key={country.name}>{country.name}</p>))
+    return (
+      <>
+      {countries.map(country => (
+          <p key={country.name}>
+            {country.name}
+            <button onClick={() => viewCountryCallback(country.name)}>show</button>
+          </p>
+      ))}
+      </>
+    )
   } else if(countries.length === 1) {
     const country = countries[0]
     const languages = country.languages.map(language => language.name)
@@ -35,6 +44,7 @@ const QueryResult = ({countries}) => {
 const App = () => {
   const [ countries, setCountries ] = useState([])
   const [ input, setNewInput ] = useState('')
+  const [ searchString, setNewSearchString ] = useState('')
 
   useEffect(() => {
     axios
@@ -46,10 +56,15 @@ const App = () => {
 
   const handleInputChange = (event) => {
     setNewInput(event.target.value)
+    setNewSearchString(event.target.value)
+  }
+
+  const viewCountryCallback = (name) => {
+    setNewSearchString(name)
   }
 
   const filteredCountries = countries.filter(country => {
-    return country.name.toLowerCase().includes(input.toLowerCase())
+    return country.name.toLowerCase().includes(searchString.toLowerCase())
   })
 
   return (
@@ -57,7 +72,7 @@ const App = () => {
     <div>
     find countries<input value={input} onChange={handleInputChange}/>
   </div>
-  <QueryResult countries={filteredCountries}/>
+  <QueryResult countries={filteredCountries} viewCountryCallback={viewCountryCallback}/>
     </div>
   )
 }
