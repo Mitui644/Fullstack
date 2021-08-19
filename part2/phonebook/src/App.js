@@ -45,6 +45,7 @@ const App = () => {
       <div>
           filter shown with<input value={searchString} onChange={handleSearchStringChange}/>
       </div>
+      <h2>add a new</h2>
       <form onSubmit={addPerson}>
         <div>
           name: <input value={newName} onChange={handleNameChange}/>
