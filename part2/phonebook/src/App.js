@@ -29,12 +29,33 @@ const Persons = ({ persons, deleteCallback }) => (
   )
 )
 
+const Notification = ({ notification }) => {
+  if (notification.message === null) {
+    return null
+  }
+
+  const className = notification.isError ? "error" : "note"
+  return (
+    <div className={className}>
+      {notification.message}
+    </div>
+  )
+}
+
 const App = () => {
   const [ persons, setPersons ] = useState([]) 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ searchString, setSearchString ] = useState('')
+  const [notification, setNotification] = useState({message: null, isError: false})
 
+  const showNotification = (message, isError) => {
+    setNotification({message, isError})
+    setTimeout(() => {
+      setNotification({message: null, isError: false})
+    }, 5000)
+  }
+  
   useEffect(() => {
     personService
       .getAll()
@@ -55,6 +76,7 @@ const App = () => {
         setPersons(persons.map(person => person.id !== existingPerson.id ? person : responseData))
         setNewName('')
         setNewNumber('')
+        showNotification(`Updated ${newName}`, false)
       })
     } else if(!existingPerson) {
       const person = { name: newName, number: newNumber } 
@@ -64,6 +86,7 @@ const App = () => {
         setPersons(persons.concat(responseData))
         setNewName('')
         setNewNumber('')
+        showNotification(`Added ${newName}`, false)
       })
     }
   }
@@ -76,6 +99,7 @@ const App = () => {
       .remove(id).then(() => {
         setPersons(persons.filter(person => person.id !== id))
       })
+      showNotification(`Removed ${name}`, false)
     }
   }
 
@@ -98,6 +122,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification notification={notification} />
 
       <Filter text={searchString} callBack={handleSearchStringChange}/>
 
