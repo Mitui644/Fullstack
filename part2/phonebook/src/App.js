@@ -21,8 +21,12 @@ const PersonForm = ({ submitCallBack, nameCallback, numberCallback, name, number
   </form>
 )
 
-const Persons = ({ persons }) => (
-  persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)
+const Persons = ({ persons, deleteCallback }) => (
+  persons.map(person => 
+  <p key={person.id}>
+    {person.name} {person.number} <button onClick={() => deleteCallback(person.id, person.name)}>delete</button>
+  </p>
+  )
 )
 
 const App = () => {
@@ -59,6 +63,17 @@ const App = () => {
     }
   }
 
+  const removePerson = (id, name) => {
+    const message = `Delete ${name} ?`
+    const result = window.confirm(message);
+    if(result) {
+      personService
+      .remove(id).then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
+    }
+  }
+
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -87,7 +102,7 @@ const App = () => {
 
       <h3>Numbers</h3>
 
-      <Persons persons={filteredPersons}/>
+      <Persons persons={filteredPersons} deleteCallback={removePerson}/>
     </div>
   )
 }
