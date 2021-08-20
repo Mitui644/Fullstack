@@ -78,6 +78,10 @@ const App = () => {
         setNewNumber('')
         showNotification(`Updated ${newName}`, false)
       })
+      .catch(error => {
+        showNotification(`Information of ${newName} has already been removed from server`, true)
+        setPersons(persons.filter(person => person.id !== existingPerson.id))
+      })
     } else if(!existingPerson) {
       const person = { name: newName, number: newNumber } 
       personService
